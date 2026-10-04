@@ -28,6 +28,8 @@ config = "mcopt-metal-startup.mixins.json"
 [[mixins]]
 config = "mcopt-metal-alloc.mixins.json"
 [[mixins]]
+config = "mcopt-metal-compat.mixins.json"
+[[mixins]]
 config = "mcopt-fps.mixins.json"
 
 [[dependencies.mcopt_metal]]
