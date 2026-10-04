@@ -10,7 +10,6 @@ import mcopt.metal.MetalBridge;
 import mcopt.metal.MetalHooks;
 import net.caffeinemc.mods.sodium.client.render.SodiumWorldRenderer;
 import net.caffeinemc.mods.sodium.client.util.GameRendererStorage;
-import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.fog.FogData;
@@ -40,7 +39,7 @@ import org.lwjgl.system.MemoryUtil;
 public final class Lod {
 	private static @Nullable Lod instance;
 	private static boolean failed;
-	private static final boolean SODIUM = FabricLoader.getInstance().isModLoaded("sodium");
+	private static final boolean SODIUM = mcopt.metal.Platform.get().isModLoaded("sodium");
 	private static final int MAX_LEVELS = 12;
 	/** ColFrame in columns.metal: A, B, C, cam, origin, cols, lines, screen, mask, maskDist (10 x 16) + 12 levels x 32. */
 	static final int COL_FRAME_BYTES = 10 * 16 + MAX_LEVELS * 32;

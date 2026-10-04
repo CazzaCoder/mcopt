@@ -50,6 +50,8 @@ final class MetalRenderPass implements RenderPassBackend {
 	private int indexInt;
 	/** What the frontend set in the encoder besides uniforms, for MetalTerrain.OCC to put back after it splits the pass. */
 	private final int[] scissor = new int[4];
+	/** Set by NeoForge's setViewport; null while the pass has its default (whole target) viewport. */
+	private int @Nullable [] viewport;
 	private final @Nullable GpuBufferSlice[] vertexBuffers = new GpuBufferSlice[4];
 	private final byte[] pushConstants = new byte[128];
 	private int pushConstantsLength;
@@ -150,6 +152,7 @@ final class MetalRenderPass implements RenderPassBackend {
 		this.dirtyUpTo = Objects.requireNonNull(this.pipeline).uniforms.size();
 		this.bindUniforms(0);
 		Native.scissor(this.enc, this.scissor[0], this.scissor[1], this.scissor[2], this.scissor[3]);
+		if (this.viewport != null) Native.viewport(this.enc, this.viewport[0], this.viewport[1], this.viewport[2], this.viewport[3]);
 		for (int slot = 0; slot < this.vertexBuffers.length; slot++) {
 			GpuBufferSlice vb = this.vertexBuffers[slot];
 			if (vb != null) Native.vertexBuffer(this.enc, MetalConst.VERTEX_BUFFER_BASE + slot, this.encoder.use(vb.buffer()).handle, vb.offset());
@@ -161,13 +164,15 @@ final class MetalRenderPass implements RenderPassBackend {
 		}
 	}
 
-	/** Binds again what p's draws are bound with now (its uniforms and the scissor), for MetalTerrain to draw more of them after a split. */
+	/** Binds again what p's draws are bound with now (its uniforms, the scissor and viewport), for MetalTerrain to draw more of them after a split. */
 	private Runnable restorer(MetalPipeline p) {
 		Object[] values = Arrays.copyOf(this.bound, p.uniforms.size());
 		int[] scissor = this.scissor.clone();
+		int[] viewport = this.viewport;
 		return () -> {
 			for (int i = 0; i < values.length; i++) this.bindUniform(p.uniforms.get(i), i, values[i]);
 			Native.scissor(this.enc, scissor[0], scissor[1], scissor[2], scissor[3]);
+			if (viewport != null) Native.viewport(this.enc, viewport[0], viewport[1], viewport[2], viewport[3]);
 		};
 	}
 
@@ -205,6 +210,12 @@ final class MetalRenderPass implements RenderPassBackend {
 		this.scissor[1] = y;
 		this.scissor[2] = width;
 		this.scissor[3] = height;
+	}
+
+	/** NeoForge adds this to RenderPassBackend (vanilla's has no viewport call), hence no @Override: the class builds for both. */
+	public void setViewport(int x, int y, int width, int height) {
+		Native.viewport(this.enc, x, y, width, height);
+		this.viewport = new int[] {x, y, width, height};
 	}
 
 	@Override

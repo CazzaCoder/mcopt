@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.zip.GZIPInputStream;
-import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
 
 /**
  * Loads, on background threads, the classes Minecraft is about to load one by one on its main thread during boot and
@@ -18,8 +17,9 @@ import net.fabricmc.loader.api.entrypoint.PreLaunchEntrypoint;
  * same classes end up loaded, only sooner and off the main thread. The list (resources/mcopt/metal/preload.txt.gz)
  * comes from a -Xlog:class+load run of the shipping stack (tools/preloadlist.py); names that don't exist in some
  * other mod set are skipped. -Dmcopt.preload=false turns it off, -Dmcopt.preload.threads=N sets the thread count.
+ * Started by the loader's early entrypoint: Fabric's preLaunch, NeoForge's mod constructor.
  */
-public final class Preload implements PreLaunchEntrypoint {
+public final class Preload {
 	static {
 		mcopt.metal.Profile.apply(); // before any flag is read
 	}
@@ -27,9 +27,10 @@ public final class Preload implements PreLaunchEntrypoint {
 	private static final boolean ENABLED = Boolean.parseBoolean(System.getProperty("mcopt.preload", "true"));
 	private static final int THREADS = Integer.getInteger("mcopt.preload.threads", 2);
 
-	@Override
-	public void onPreLaunch() {
-		PlatformCheck.run();
+	private Preload() {
+	}
+
+	public static void start() {
 		if (!ENABLED) return;
 		List<String> names = new ArrayList<>();
 		try (InputStream in = Preload.class.getResourceAsStream("/mcopt/metal/preload.txt.gz")) {

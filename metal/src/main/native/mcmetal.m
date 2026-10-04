@@ -844,6 +844,11 @@ void mc_r_scissor(Enc *enc, int x, int y, int w, int h) {
 	[enc->render setScissorRect:(MTLScissorRect) {x, y, w, h}];
 }
 
+// NeoForge's RenderPass.setViewport; same origin (top left) and depth range as the pass's default viewport.
+void mc_r_viewport(Enc *enc, int x, int y, int w, int h) {
+	[enc->render setViewport:(MTLViewport) {x, y, w, h, 0, 1}];
+}
+
 // A buffer the vertex stage reaches through a GPU address stored in another buffer (bindless) must be made resident.
 void mc_r_use(Enc *enc, id<MTLBuffer> buffer) {
 	[enc->render useResource:buffer usage:MTLResourceUsageRead stages:MTLRenderStageVertex];

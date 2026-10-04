@@ -48,6 +48,19 @@ fps spinning / flying, same test world, 1920x1080, render distance 16, VSync off
 - Faster startup
 - Wider hardware testing
 
+## NeoForge (work in progress)
+
+A NeoForge build lives in `neoforge/`. It's built from the same sources as the Fabric jars; only the loader glue
+(`mcopt.metal.neoforge`) differs, and the fps counter ships in the same jar.
+
+- Needs NeoForge 26.3.0.48-beta or newer and Sodium 0.9.3 for NeoForge:
+  [sodium-neoforge-0.9.3-alpha.1+mc26.3.jar](https://cdn.modrinth.com/data/AANobbMI/versions/NM9w06Kr/sodium-neoforge-0.9.3-alpha.1%2Bmc26.3.jar)
+- Build: `./gradlew :neoforge:build` (with Java 25) makes `neoforge/build/libs/mcopt-neoforge-VERSION.jar`.
+- Try it: `./gradlew :neoforge:runClient` starts a dev client with Sodium in `neoforge/run/mods`.
+- Known gaps: the Metal backend has no stencil support yet, so mods that draw with NeoForge's stencil API lose
+  those effects (a warning is logged once). The class preload starts at mod construction, later than Fabric's preLaunch.
+  Client only: don't put it on a dedicated server.
+
 ## Licence and credits
 
 [Apache License 2.0](LICENSE). Keep the [NOTICE](NOTICE) file with any copy, and credit mcopt. Files adapted from

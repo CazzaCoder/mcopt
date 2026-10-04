@@ -247,7 +247,7 @@ final class MetalPipeline implements BackendRenderPipeline {
 	static int mslMismatches;
 	private static final java.nio.file.Path MSL_DIR = MSL_CACHE ? (System.getProperty("mcopt.startup.mslCacheDir") != null
 		? java.nio.file.Path.of(System.getProperty("mcopt.startup.mslCacheDir"))
-		: net.fabricmc.loader.api.FabricLoader.getInstance().getGameDir().resolve("mcopt-cache").resolve("msl")) : null;
+		: Platform.get().gameDir().resolve("mcopt-cache").resolve("msl")) : null;
 	/** What the translation depends on besides its inputs: this class's code (options, bindings) and the SPIRV-Cross build. */
 	private static final String MSL_KEY_SALT = MSL_CACHE ? mslSalt() : null;
 

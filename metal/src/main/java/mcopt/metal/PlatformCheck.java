@@ -1,21 +1,17 @@
 package mcopt.metal;
 
-import net.fabricmc.loader.impl.gui.FabricGuiEntry;
-import net.fabricmc.loader.impl.util.log.Log;
-import net.fabricmc.loader.impl.util.log.LogCategory;
-
 /**
  * Stops the launch, before any Metal class loads, on a machine the native library can't run on: it is arm64-only and
- * the mod supports macOS 26 and later. The message goes to the log and to Fabric's own error dialog (the one it shows
- * for a missing dependency), then the game exits. A plain exception from preLaunch would only show up as "A mod crashed
- * on startup!" with the reason buried in a stack trace. -Dmcopt.platformCheck.fake=linux (or x86_64, or a macOS
+ * the mod supports macOS 26 and later. The message goes to the loader's own error screen (Platform.fatal), then the game
+ * exits. A plain exception from preLaunch would only show up as "A mod crashed on startup!" with the reason buried in a
+ * stack trace. -Dmcopt.platformCheck.fake=linux (or x86_64, or a macOS
  * version like 15.5) pretends to be that platform, to test the message.
  */
-final class PlatformCheck {
+public final class PlatformCheck {
 	private PlatformCheck() {
 	}
 
-	static void run() {
+	public static void run() {
 		String os = System.getProperty("os.name", ""), arch = System.getProperty("os.arch", ""), version = System.getProperty("os.version", "");
 		String fake = System.getProperty("mcopt.platformCheck.fake");
 		if (fake != null) {
@@ -27,13 +23,7 @@ final class PlatformCheck {
 		if (problem == null) return;
 		String message = "mcopt Metal can't run here. " + problem
 			+ " To play on this computer, remove the mcopt-metal jar from the mods folder.";
-		Log.error(LogCategory.GENERAL, message);
-		try {
-			FabricGuiEntry.displayError(message, null, true); // exits the game
-		} catch (Throwable t) {
-			throw new IllegalStateException(message, t);
-		}
-		throw new IllegalStateException(message);
+		Platform.get().fatal(message);
 	}
 
 	private static String problem(String os, String arch, String version) {

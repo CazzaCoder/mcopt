@@ -1,0 +1,96 @@
+plugins {
+	id 'net.neoforged.moddev' version "${moddev_version}"
+}
+
+// One jar for NeoForge: the Metal mod and the fps counter (NeoForge allows several mods per jar), built from the
+// Fabric subprojects' sources. Only the loader glue differs: mcopt/metal/fabric/** stays out, mcopt/metal/neoforge/**
+// (here) comes in. The natives come from :metal:compileNative.
+evaluationDependsOn(':metal')
+version = project(':metal').version
+base.archivesName = 'mcopt-neoforge'
+
+repositories {
+	// Sodium at build time only: mcopt hooks into it at runtime and never bundles it.
+	maven {
+		url = 'https://api.modrinth.com/maven'
+		content { includeGroup 'maven.modrinth' }
+	}
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
+
+sourceSets.main {
+	java {
+		srcDir project(':metal').file('src/main/java')
+		srcDir project(':fpshud').file('src/main/java')
+		exclude 'mcopt/metal/fabric/**'
+	}
+	resources {
+		srcDir project(':metal').file('src/main/resources')
+		srcDir project(':fpshud').file('src/main/resources')
+		exclude 'fabric.mod.json'
+	}
+}
+
+configurations {
+	sodiumNeoForge { canBeConsumed = false; transitive = false }
+}
+
+dependencies {
+	sodiumNeoForge "maven.modrinth:sodium:${sodium_neoforge_version}"
+}
+
+// Sodium's NeoForge jar is a shell around its real mod jar (META-INF/jarjar/): compile against the inner one.
+def sodiumInner = tasks.register('extractSodium', Sync) {
+	from({ zipTree(configurations.sodiumNeoForge.singleFile).matching { include 'META-INF/jarjar/*.jar' } })
+	into layout.buildDirectory.dir('sodium')
+	eachFile { path = name }
+	includeEmptyDirs = false
+}
+
+dependencies {
+	compileOnly files(sodiumInner.map { it.destinationDir.listFiles().findAll { it.name.endsWith('.jar') } }) { builtBy sodiumInner }
+}
+
+neoForge {
+	version = neoforge_version
+	runs {
+		client {
+			client()
+			gameDirectory = file('run')
+			// macOS: SDL/Cocoa windows must be made on the process's first thread.
+			jvmArguments.add('-XstartOnFirstThread')
+			// The Metal backend calls libmcmetal through java.lang.foreign: without this Java warns at every launch.
+			jvmArguments.add('--enable-native-access=mcopt_metal')
+		}
+	}
+	mods {
+		'mcopt_metal' { sourceSet sourceSets.main }
+	}
+}
+
+// The game finds Sodium in run/mods (copied there, not on the classpath, so NeoForge loads it like any installed mod).
+tasks.register('installSodium', Copy) {
+	from configurations.sodiumNeoForge
+	into file('run/mods')
+}
+tasks.matching { it.name == 'prepareClientRun' }.configureEach { dependsOn 'installSodium' }
+
+processResources {
+	dependsOn ':metal:compileNative'
+	from(project(':metal').layout.buildDirectory.dir('natives'))
+	inputs.property 'version', version
+	filesMatching('META-INF/neoforge.mods.toml') { expand 'version': version }
+}
+
+jar {
+	manifest { attributes 'Implementation-Version': version }
+	from(rootProject.file('LICENSE'))
+	from(rootProject.file('NOTICE'))
+	from(rootProject.file('LICENSES')) { into 'LICENSES' }
+}
+
+tasks.withType(JavaCompile).configureEach {
+	it.options.release = 25
+	if (it.name == 'compileJava') it.options.compilerArgs += ['--add-modules', 'jdk.incubator.vector']
+}

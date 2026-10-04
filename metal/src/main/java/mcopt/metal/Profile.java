@@ -139,7 +139,7 @@ public final class Profile {
 
 	private static Path gameDir() {
 		try {
-			return net.fabricmc.loader.api.FabricLoader.getInstance().getGameDir();
+			return Platform.get().gameDir();
 		} catch (Throwable t) {
 			return Path.of("").toAbsolutePath();
 		}

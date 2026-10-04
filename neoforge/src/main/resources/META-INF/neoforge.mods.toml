@@ -1,0 +1,52 @@
+modLoader = "javafml"
+loaderVersion = "[1,)"
+license = "Apache-2.0 AND LicenseRef-PolyForm-Shield-1.0.0"
+
+[[mods]]
+modId = "mcopt_metal"
+version = "${version}"
+displayName = "mcopt Metal"
+authors = "Noah Dunnagan"
+description = '''
+Native Apple Metal rendering backend, with an fps counter in the top-left corner.
+'''
+
+[[mixins]]
+config = "mcopt-metal.mixins.json"
+[[mixins]]
+config = "mcopt-metal-qos.mixins.json"
+[[mixins]]
+config = "mcopt-metal-cpu.mixins.json"
+[[mixins]]
+config = "mcopt-metal-chunk.mixins.json"
+[[mixins]]
+config = "mcopt-metal-lod.mixins.json"
+[[mixins]]
+config = "mcopt-metal-gen.mixins.json"
+[[mixins]]
+config = "mcopt-metal-startup.mixins.json"
+[[mixins]]
+config = "mcopt-metal-alloc.mixins.json"
+[[mixins]]
+config = "mcopt-fps.mixins.json"
+
+[[dependencies.mcopt_metal]]
+modId = "neoforge"
+type = "required"
+versionRange = "[26.3.0.48-beta,)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.mcopt_metal]]
+modId = "minecraft"
+type = "required"
+versionRange = "[26.3,26.4)"
+ordering = "NONE"
+side = "CLIENT"
+
+[[dependencies.mcopt_metal]]
+modId = "sodium"
+type = "required"
+versionRange = "[0.9.3-alpha.1,0.9.4-alpha)"
+ordering = "AFTER"
+side = "CLIENT"

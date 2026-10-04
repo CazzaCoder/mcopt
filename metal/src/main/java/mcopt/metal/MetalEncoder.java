@@ -429,6 +429,19 @@ final class MetalEncoder implements CommandEncoderBackend {
 		this.deferClear(depthTexture, null, clearDepth);
 	}
 
+	private static boolean stencilWarned;
+
+	/**
+	 * NeoForge adds this to CommandEncoderBackend (vanilla never clears stencil), hence no @Override. This backend attaches no
+	 * stencil to its passes and its pipelines run no stencil test yet, so nothing it draws could read the cleared value: the
+	 * clear is skipped, with one warning, until NeoForge's stencil support (DepthStencilState.stencilTest) is implemented.
+	 */
+	public void clearStencilTexture(GpuTexture texture, int value) {
+		if (stencilWarned) return;
+		stencilWarned = true;
+		System.out.println("mcopt-metal: a mod uses stencil (clearStencilTexture on " + texture.getLabel() + "), which the Metal backend doesn't support yet: its stencil effects won't show");
+	}
+
 	private void clearRegion(@Nullable MetalTexture color, @Nullable Vector4fc clearColor, @Nullable MetalTexture depth, double clearDepth,
 		int x, int y, int width, int height, int mip) {
 		this.trace("clearRect", color, depth, x, y, width, height, mip);

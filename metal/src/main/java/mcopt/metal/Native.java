@@ -74,6 +74,7 @@ final class Native {
 	private static final MethodHandle R_BYTES = fn("mc_r_bytes", true, null, JAVA_LONG, JAVA_INT, JAVA_LONG, JAVA_INT);
 	private static final MethodHandle R_TEXTURE = fn("mc_r_texture", true, null, JAVA_LONG, JAVA_INT, JAVA_LONG, JAVA_LONG);
 	private static final MethodHandle R_SCISSOR = fn("mc_r_scissor", true, null, JAVA_LONG, JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT);
+	private static final MethodHandle R_VIEWPORT = fn("mc_r_viewport", true, null, JAVA_LONG, JAVA_INT, JAVA_INT, JAVA_INT, JAVA_INT);
 	private static final MethodHandle R_INDEX = fn("mc_r_index", true, null, JAVA_LONG, JAVA_LONG, JAVA_INT);
 	private static final MethodHandle R_USE = fn("mc_r_use", true, null, JAVA_LONG, JAVA_LONG);
 	private static final MethodHandle GPU_ADDRESS = fn("mc_buffer_gpu_address", true, JAVA_LONG, JAVA_LONG);
@@ -187,6 +188,7 @@ final class Native {
 	static void bytes(long enc, int index, long bytes, int length) { try { R_BYTES.invokeExact(enc, index, bytes, length); } catch (Throwable t) { throw rethrow(t); } }
 	static void texture(long enc, int index, long texture, long sampler) { try { R_TEXTURE.invokeExact(enc, index, texture, sampler); } catch (Throwable t) { throw rethrow(t); } }
 	static void scissor(long enc, int x, int y, int w, int h) { try { R_SCISSOR.invokeExact(enc, x, y, w, h); } catch (Throwable t) { throw rethrow(t); } }
+	static void viewport(long enc, int x, int y, int w, int h) { try { R_VIEWPORT.invokeExact(enc, x, y, w, h); } catch (Throwable t) { throw rethrow(t); } }
 	static void index(long enc, long buffer, int intIndices) { try { R_INDEX.invokeExact(enc, buffer, intIndices); } catch (Throwable t) { throw rethrow(t); } }
 	static void useResource(long enc, long buffer) { try { R_USE.invokeExact(enc, buffer); } catch (Throwable t) { throw rethrow(t); } }
 	static long gpuAddress(long buffer) { try { return (long) GPU_ADDRESS.invokeExact(buffer); } catch (Throwable t) { throw rethrow(t); } }
