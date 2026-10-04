@@ -11,8 +11,11 @@ public interface Platform {
 
 	boolean isModLoaded(String id);
 
-	/** Stops the launch with this message, in the loader's own error screen where it has one. Never returns normally. */
-	void fatal(String message);
+	/**
+	 * A dedicated server, where mcopt (client only) switches itself off (PlatformCheck). Fabric never loads it there
+	 * ("environment": "client"); NeoForge has no such switch.
+	 */
+	boolean isDedicatedServer();
 
 	static Platform get() {
 		return Holder.INSTANCE;

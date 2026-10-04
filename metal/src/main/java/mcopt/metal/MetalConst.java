@@ -61,7 +61,9 @@ final class MetalConst {
 			case D16_UNORM -> 250;
 			case D32_FLOAT -> 252;
 			case S8_UINT -> 253;
-			case D32_FLOAT_S8_UINT, D24_UNORM_S8_UINT -> 260; // Apple GPUs have no 24-bit depth
+			// Plain depth, no stencil plane: the backend has no stencil support yet (MetalEncoder.clearStencilTexture), and every
+			// pipeline is built for Depth32Float, so a stencil-format target (NeoForge mods can make one) still matches them.
+			case D32_FLOAT_S8_UINT, D24_UNORM_S8_UINT -> 252;
 			default -> throw new IllegalArgumentException("Metal has no texture format for " + format);
 		};
 	}

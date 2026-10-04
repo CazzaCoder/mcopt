@@ -16,6 +16,7 @@ public final class QosMixinPlugin implements IMixinConfigPlugin {
 	@Override public void onLoad(String mixinPackage) { }
 	@Override public String getRefMapperConfig() { return null; }
 	@Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if (!mcopt.metal.PlatformCheck.enabled()) return false;
 		String role = mixinClassName.substring(mixinClassName.lastIndexOf('.') + 1).replace("QosMixin", "").toLowerCase(java.util.Locale.ROOT);
 		return Qos.has(role);
 	}

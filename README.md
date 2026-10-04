@@ -33,6 +33,8 @@ fps spinning / flying, same test world, 1920x1080, render distance 16, VSync off
 
 ## Known issues
 
+- Anywhere but an Apple Silicon Mac on macOS 26+ (or on a dedicated server), mcopt switches itself off: no mixins,
+  no Metal, no fps counter, one line in the log saying why. Safe to ship in a modpack. Sodium is still required.
 - Only Sodium 0.9.3 works. With another version, Fabric stops at launch and says which one to install.
 - Mods that call OpenGL directly can't draw on the Metal backend. `-Dmcopt.metal=false` switches mcopt's renderer off.
 - Far terrain is experimental. On Macs with fewer than 10 GPU cores, it costs most of the fps.
@@ -56,10 +58,10 @@ A NeoForge build lives in `neoforge/`. It's built from the same sources as the F
 - Needs NeoForge 26.3.0.48-beta or newer and Sodium 0.9.3 for NeoForge:
   [sodium-neoforge-0.9.3-alpha.1+mc26.3.jar](https://cdn.modrinth.com/data/AANobbMI/versions/NM9w06Kr/sodium-neoforge-0.9.3-alpha.1%2Bmc26.3.jar)
 - Build: `./gradlew :neoforge:build` (with Java 25) makes `neoforge/build/libs/mcopt-neoforge-VERSION.jar`.
-- Try it: `./gradlew :neoforge:runClient` starts a dev client with Sodium in `neoforge/run/mods`.
+- Try it: `./gradlew :neoforge:runClient` starts a dev client with Sodium in `neoforge/run/mods`. mcopt flags go in
+  with `-Pmcopt.jvmArgs="-Dmcopt.lod=true"`; `-Dmcopt.platformCheck.fake=linux` shows the switched-off game.
 - Known gaps: the Metal backend has no stencil support yet, so mods that draw with NeoForge's stencil API lose
   those effects (a warning is logged once). The class preload starts at mod construction, later than Fabric's preLaunch.
-  Client only: don't put it on a dedicated server.
 
 ## Licence and credits
 

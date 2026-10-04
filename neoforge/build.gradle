@@ -55,13 +55,21 @@ dependencies {
 neoForge {
 	version = neoforge_version
 	runs {
+		configureEach {
+			// mcopt flags for a dev run without editing files: -Pmcopt.jvmArgs="-Dmcopt.lod=true -Dmcopt.preload=false"
+			jvmArguments.addAll(providers.gradleProperty('mcopt.jvmArgs').map { it.trim().split(/\s+/).toList() }.orElse([]))
+		}
 		client {
 			client()
 			gameDirectory = file('run')
 			// macOS: SDL/Cocoa windows must be made on the process's first thread.
 			jvmArguments.add('-XstartOnFirstThread')
-			// The Metal backend calls libmcmetal through java.lang.foreign: without this Java warns at every launch.
-			jvmArguments.add('--enable-native-access=mcopt_metal')
+		}
+		// mcopt is client only; this checks it stays out of the way on a dedicated server.
+		server {
+			server()
+			gameDirectory = file('run-server')
+			programArgument('--nogui')
 		}
 	}
 	mods {

@@ -16,6 +16,7 @@ public final class CpuMixinPlugin implements IMixinConfigPlugin {
 	@Override public void onLoad(String mixinPackage) { }
 	@Override public String getRefMapperConfig() { return null; }
 	@Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if (!mcopt.metal.PlatformCheck.enabled()) return false;
 		String name = mixinClassName.substring(mixinClassName.lastIndexOf('.') + 1);
 		if (name.endsWith("Access")) return Cpu.cullHooks();
 		if (name.startsWith("Cull")) return Cpu.cullHooks();

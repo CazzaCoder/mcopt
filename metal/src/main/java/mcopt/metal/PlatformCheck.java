@@ -1,17 +1,25 @@
 package mcopt.metal;
 
 /**
- * Stops the launch, before any Metal class loads, on a machine the native library can't run on: it is arm64-only and
- * the mod supports macOS 26 and later. The message goes to the loader's own error screen (Platform.fatal), then the game
- * exits. A plain exception from preLaunch would only show up as "A mod crashed on startup!" with the reason buried in a
- * stack trace. -Dmcopt.platformCheck.fake=linux (or x86_64, or a macOS
- * version like 15.5) pretends to be that platform, to test the message.
+ * Decides once whether mcopt runs in this game: only on the client of an Apple Silicon Mac with macOS 26 or later (the
+ * native library is arm64-only). Anywhere else it switches itself off, with one log line saying why, and the game runs as
+ * if it weren't installed, so the jar is safe in a modpack that's also played on other computers. Every mixin config
+ * plugin, the profile and the loader entrypoints ask {@link #enabled()} first; when it is false no mixin applies and
+ * nothing of the Metal backend or the natives loads. Reads only system properties (and the loader's side), so it is safe
+ * in mixin config plugins. -Dmcopt.platformCheck.fake=linux (or x86_64, or a macOS version like 15.5) pretends to be that
+ * platform, to test it.
  */
 public final class PlatformCheck {
+	private static final boolean ENABLED = decide();
+
 	private PlatformCheck() {
 	}
 
-	public static void run() {
+	public static boolean enabled() {
+		return ENABLED;
+	}
+
+	private static boolean decide() {
 		String os = System.getProperty("os.name", ""), arch = System.getProperty("os.arch", ""), version = System.getProperty("os.version", "");
 		String fake = System.getProperty("mcopt.platformCheck.fake");
 		if (fake != null) {
@@ -20,10 +28,10 @@ public final class PlatformCheck {
 			else os = fake;
 		}
 		String problem = problem(os, arch, version);
-		if (problem == null) return;
-		String message = "mcopt Metal can't run here. " + problem
-			+ " To play on this computer, remove the mcopt-metal jar from the mods folder.";
-		Platform.get().fatal(message);
+		if (problem == null && Platform.get().isDedicatedServer()) problem = "It's client only, and this is a dedicated server.";
+		if (problem == null) return true;
+		System.out.println("[mcopt] mcopt Metal is switched off. " + problem + " The game runs as if it weren't installed.");
+		return false;
 	}
 
 	private static String problem(String os, String arch, String version) {

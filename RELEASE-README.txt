@@ -25,8 +25,8 @@ For the most fps: Options > Video Settings, VSync off and Max Framerate Unlimite
 Shows an fps counter in the top-left corner (hidden with F1 or F3).
 
 If Sodium is missing or the wrong version, Fabric stops at launch and tells you which version to install.
-On a computer the mod can't run on (not an Apple Silicon Mac, or macOS older than 26), the game stops at launch
-and says what's missing; remove mcopt-metal from the mods folder to play there.
+On a computer the mod can't run on (not an Apple Silicon Mac, or macOS older than 26), it switches itself off and the
+game runs as if it weren't installed; the game log says why. So it's safe in a modpack that's also played elsewhere.
 To check it's working, the game log says "Using graphics backend Metal".
 
 mcopt turns on its measured speed-ups by itself (the alpha profile), picked for your Mac. The first launch writes

@@ -11,6 +11,7 @@ public final class AllocMixinPlugin implements IMixinConfigPlugin {
 	@Override public void onLoad(String mixinPackage) { }
 	@Override public String getRefMapperConfig() { return null; }
 	@Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if (!mcopt.metal.PlatformCheck.enabled()) return false;
 		if (mixinClassName.endsWith("LightMapMixin")) return Boolean.getBoolean("mcopt.alloc.lightMap");
 		return false;
 	}

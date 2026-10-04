@@ -34,6 +34,7 @@ public final class ChunkMixinPlugin implements IMixinConfigPlugin {
 
 	@Override
 	public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if (!mcopt.metal.PlatformCheck.enabled()) return false;
 		String name = mixinClassName.substring(mixinClassName.lastIndexOf('.') + 1);
 		if (!ChunkOpt.mixinEnabled(name)) return false;
 		for (String mod : YIELDS_TO.getOrDefault(name, List.of())) {

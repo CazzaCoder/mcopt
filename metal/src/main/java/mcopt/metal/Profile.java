@@ -37,6 +37,7 @@ public final class Profile {
 	public static synchronized void apply() {
 		if (applied) return;
 		applied = true;
+		if (!PlatformCheck.enabled()) return;
 		Properties file = new Properties();
 		Path cfg = gameDir().resolve("config").resolve("mcopt.properties");
 		if (Files.isRegularFile(cfg)) {

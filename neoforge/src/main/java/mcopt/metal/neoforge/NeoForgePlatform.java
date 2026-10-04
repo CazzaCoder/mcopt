@@ -2,8 +2,6 @@ package mcopt.metal.neoforge;
 
 import java.nio.file.Path;
 import mcopt.metal.Platform;
-import net.neoforged.fml.ModLoadingException;
-import net.neoforged.fml.ModLoadingIssue;
 import net.neoforged.fml.loading.FMLLoader;
 
 public final class NeoForgePlatform implements Platform {
@@ -18,10 +16,8 @@ public final class NeoForgePlatform implements Platform {
 		return FMLLoader.getCurrent().getLoadingModList().getModFileById(id) != null;
 	}
 
-	/** Thrown from the mod constructor, before the game makes its window: NeoForge shows it on its error screen. */
 	@Override
-	public void fatal(String message) {
-		System.out.println("[mcopt] " + message);
-		throw new ModLoadingException(ModLoadingIssue.error(message));
+	public boolean isDedicatedServer() {
+		return FMLLoader.getCurrent().getDist().isDedicatedServer();
 	}
 }

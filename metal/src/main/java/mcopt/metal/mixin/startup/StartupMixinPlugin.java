@@ -15,6 +15,7 @@ public final class StartupMixinPlugin implements IMixinConfigPlugin {
 	@Override public void onLoad(String mixinPackage) { }
 	@Override public String getRefMapperConfig() { return null; }
 	@Override public boolean shouldApplyMixin(String targetClassName, String mixinClassName) {
+		if (!mcopt.metal.PlatformCheck.enabled()) return false;
 		// System properties only: loading mcopt.metal.Startup here would load game classes before their own mixins apply.
 		if (mixinClassName.endsWith("NarratorMixin")) return "lazy".equals(System.getProperty("mcopt.startup.narrator"));
 		if (mixinClassName.endsWith("CrashPreloadMixin")) return "async".equals(System.getProperty("mcopt.startup.crashPreload"));
