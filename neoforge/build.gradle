@@ -58,11 +58,20 @@ neoForge {
 		configureEach {
 			// mcopt flags for a dev run without editing files: -Pmcopt.jvmArgs="-Dmcopt.lod=true -Dmcopt.preload=false"
 			jvmArguments.addAll(providers.gradleProperty('mcopt.jvmArgs').map { it.trim().split(/\s+/).toList() }.orElse([]))
+			// and game arguments, e.g. -Pmcopt.gameArgs="--quickPlaySingleplayer TestWorld" to go straight into a world
+			programArguments.addAll(providers.gradleProperty('mcopt.gameArgs').map { it.trim().split(/\s+/).toList() }.orElse([]))
 		}
 		client {
 			client()
 			gameDirectory = file('run')
 			// macOS: SDL/Cocoa windows must be made on the process's first thread.
+			jvmArguments.add('-XstartOnFirstThread')
+		}
+		// Compatibility runs, kept apart from run/: its own game folder (-Pmcopt.compatDir, default run-compat) with Sodium
+		// and whatever other mods are put in its mods folder.
+		clientCompat {
+			client()
+			gameDirectory = file(providers.gradleProperty('mcopt.compatDir').orElse('run-compat'))
 			jvmArguments.add('-XstartOnFirstThread')
 		}
 		// mcopt is client only; this checks it stays out of the way on a dedicated server.
@@ -77,12 +86,18 @@ neoForge {
 	}
 }
 
-// The game finds Sodium in run/mods (copied there, not on the classpath, so NeoForge loads it like any installed mod).
+// The game finds Sodium in each client run's mods folder (copied there, not on the classpath, so NeoForge loads it like
+// any installed mod).
 tasks.register('installSodium', Copy) {
 	from configurations.sodiumNeoForge
 	into file('run/mods')
 }
+tasks.register('installSodiumCompat', Copy) {
+	from configurations.sodiumNeoForge
+	into file(providers.gradleProperty('mcopt.compatDir').orElse('run-compat').map { "$it/mods" })
+}
 tasks.matching { it.name == 'prepareClientRun' }.configureEach { dependsOn 'installSodium' }
+tasks.matching { it.name == 'prepareClientCompatRun' }.configureEach { dependsOn 'installSodiumCompat' }
 
 processResources {
 	dependsOn ':metal:compileNative'

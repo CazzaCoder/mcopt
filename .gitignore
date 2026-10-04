@@ -8,3 +8,4 @@ __pycache__/
 mcopt-pack-cache/
 dist/
 run-server/
+run-compat*/
